@@ -1,6 +1,8 @@
 import os
+import json
+import subprocess
 import tempfile
-from PIL import Image, ImageDraw, ImageFont
+import sys
 
 def create_text_overlay_image(
     text,
@@ -14,56 +16,47 @@ def create_text_overlay_image(
     corner_radius=7.5
 ):
     """
-    Creates a text overlay image using Pillow.
+    Calls the external qt_renderer.py script to generate the image.
+    This avoids threading crashes when running PySide6 inside Streamlit.
     """
-    # Load Font
-    try:
-        if font_path and os.path.exists(font_path):
-            font = ImageFont.truetype(font_path, font_size)
-        else:
-            # Fallback to a default font if path doesn't exist
-            font = ImageFont.load_default()
-    except Exception:
-        font = ImageFont.load_default()
-
-    # Create a dummy image to measure text size
-    # In newer Pillow versions, use font.getbbox() or font.getlength()
-    dummy_img = Image.new('RGBA', (1, 1), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(dummy_img)
     
-    # Get text bounding box
-    bbox = draw.textbbox((0, 0), text, font=font)
-    text_w = bbox[2] - bbox[0]
-    text_h = bbox[3] - bbox[1]
-
-    # Final image size includes padding
-    img_width = int(text_w + padding * 2)
-    img_height = int(text_h + padding * 2)
-
-    # Create final image
-    img = Image.new('RGBA', (img_width, img_height), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-
-    # Draw rounded background rectangle with alpha
-    if bg_color:
-        r, g, b = bg_color
-        alpha = int(bg_opacity * 255)
-        # Pillow's rounded_rectangle uses [x0, y0, x1, y1]
-        bg_shape = [padding/2, padding/2, img_width - padding/2, img_height - padding/2]
-        draw.rounded_rectangle(bg_shape, radius=corner_radius, fill=(r, g, b, alpha))
-
-    # Draw centered text
-    # text_color is RGB, add alpha 255
-    full_text_color = (*text_color, 255)
-    
-    # Calculate text position to center it within the padded area
-    text_x = (img_width - text_w) / 2
-    text_y = (img_height - text_h) / 2 - bbox[1] # Adjust for baseline
-    
-    draw.text((text_x, text_y), text, font=font, fill=full_text_color)
-
-    # Save to temp file
+    # Create a temp file path for the output image
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-    img.save(temp_file.name)
+    out_path = temp_file.name
     temp_file.close()
-    return temp_file.name
+
+    # Prepare arguments
+    args = {
+        "text": text,
+        "font_path": font_path,
+        "font_family": font_family,
+        "font_size": font_size,
+        "text_color": text_color,
+        "bg_color": bg_color,
+        "bg_opacity": bg_opacity,
+        "padding": padding,
+        "corner_radius": corner_radius,
+        "out_path": out_path
+    }
+
+    renderer_script = os.path.join(os.path.dirname(__file__), "qt_renderer.py")
+    
+    try:
+        # Run the renderer in a separate process
+        process = subprocess.run(
+            [sys.executable, renderer_script, "--json", json.dumps(args)],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        
+        if "SUCCESS" in process.stdout:
+            return out_path
+        else:
+            print(f"Renderer Error Output: {process.stderr}")
+            print(f"Renderer Standard Output: {process.stdout}")
+            raise RuntimeError("Renderer script failed to generate image.")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Subprocess Error: {e.stderr}")
+        raise RuntimeError(f"Failed to execute Qt renderer: {e.stderr}")
