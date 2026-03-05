@@ -8,7 +8,7 @@ import ui_components as ui
 
 def render_trim_tab(codec, audio_codec, render_preset, render_threads):
     with st.container():
-        video_file = st.file_uploader("Upload Video", type=["mp4","mov","avi"], key=f"trim_{st.session_state.reset_key}")
+        video_file = st.file_uploader("Upload Video", type=["mp4","mov","avi","WMV"], key=f"trim_{st.session_state.reset_key}")
     
     if video_file:
         video_path = uf.save_temp_file(video_file, ".mp4")
