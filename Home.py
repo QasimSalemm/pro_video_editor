@@ -99,7 +99,7 @@ with st.sidebar.expander("Help & Info", expanded=False):
 
 # Button to return to Editor
 if st.session_state.app_mode != "Video Editor":
-    if st.sidebar.button("Back to Editor", use_container_width=True, type="primary"):
+    if st.sidebar.button("Back to Editor", width="stretch", type="primary"):
         st.session_state.app_mode = "Video Editor"
         st.rerun()
 
@@ -116,7 +116,7 @@ if st.session_state.app_mode == "Video Editor":
         merge_method = st.selectbox("Merging Strategy", ["compose", "chain"], index=0, help="'Compose' is slower but handles different resolutions. 'Chain' is much faster but requires identical video properties.")
 
     st.sidebar.header("Maintenance")
-    if st.sidebar.button("Reset Project", type="secondary", use_container_width=True):
+    if st.sidebar.button("Reset Project", type="secondary", width="stretch"):
         st.session_state.reset_key += 1
         st.session_state.mt_overlays = []
         uf.cleanup_workspace(["temp_uploads", "temp_outputs"])

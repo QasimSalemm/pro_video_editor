@@ -140,7 +140,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                     is_editing = st.session_state.mt_edit_index is not None
                     btn_label = "Update Layer" if is_editing else "Add Layer to Project"
                     
-                    if st.button(btn_label, use_container_width=True, type="primary"):
+                    if st.button(btn_label, width="stretch", type="primary"):
                         if txt.strip():
                             # Style widgets are defined below, but their keys are accessible in session state
                             fonts = ui.get_fonts()
@@ -171,7 +171,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                             st.rerun()
                     
                     if is_editing:
-                        if st.button("Cancel Edit", use_container_width=True):
+                        if st.button("Cancel Edit", width="stretch"):
                             st.session_state.mt_edit_index = None
                             st.rerun()
 
@@ -188,7 +188,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                                 st.session_state.mt_bulk_df = chunk
                                 st.session_state.last_uploaded = bulk_file.name
                             
-                            df = st.data_editor(st.session_state.mt_bulk_df, use_container_width=True, key="mt_bulk_editor")
+                            df = st.data_editor(st.session_state.mt_bulk_df, width="stretch", key="mt_bulk_editor")
                             st.session_state.mt_bulk_df = df # Keep edits in state
                             
                             required = ["text", "start", "end"]
@@ -198,9 +198,9 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                                 st.number_input("Preview Row #", 0, len(df)-1, 0, key="mt_bulk_row_num")
                                 
                                 # Actions stacked vertically
-                                st.button("👁️ Load into Monitor", use_container_width=True, on_click=load_bulk_row_to_preview)
+                                st.button("👁️ Load into Monitor", width="stretch", on_click=load_bulk_row_to_preview)
                                 
-                                if st.button("➕ Import All as Layers", use_container_width=True, type="primary"):
+                                if st.button("➕ Import All as Layers", width="stretch", type="primary"):
                                     # Get current styles
                                     cur_f_sz = st.session_state.get("mt_f_size", 20)
                                     cur_t_c = st.session_state.get("mt_t_col", "#000000")
@@ -353,7 +353,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                         
                         combined.resize((disp_w, disp_h)).save(preview_path)
                         
-                        st.image(preview_path, use_container_width=True, caption=f"Preview Monitor at {clamped_t:.2f}s")
+                        st.image(preview_path, width="stretch", caption=f"Preview Monitor at {clamped_t:.2f}s")
                         
                         if not fonts:
                             st.warning("⚠️ No system fonts found. Using basic default font.")
@@ -400,7 +400,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
 
         # --- Final Export ---
 
-        if st.button("Render & Export Final Video", type="primary", use_container_width=True):
+        if st.button("Render & Export Final Video", type="primary", width="stretch"):
             st.write("**Rendering your masterpiece...**")
             final_clip = video
             
