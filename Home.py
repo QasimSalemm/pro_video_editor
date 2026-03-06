@@ -16,7 +16,7 @@ import tabs.info_pages as info_pages
 # ==============================
 st.set_page_config(
     page_title="Video Editor - All-in-One",
-    page_icon="🎬",
+    page_icon="images/subtitles_theme.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
