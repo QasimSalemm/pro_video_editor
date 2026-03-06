@@ -20,3 +20,4 @@ libxcb-xkb1
 libxcb-shm0
 libxcb-util1
 x11-common
+libdbus-1-3
