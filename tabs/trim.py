@@ -40,7 +40,7 @@ def render_trim_tab(codec, audio_codec, render_preset, render_threads):
             ui.render_preview_video(video_file, w_pct, h_px, caption_text=f"Editing: {video_file.name}")
                 
         # --- Full-Width Action Row ---
-        if st.button("Create Subclip", type="primary", use_container_width=True):
+        if st.button("Create Subclip", type="primary", width="stretch"):
             if start < end:
                 st.write("**Creating Subclip...**")
                 sub = video.subclip(start, end)
