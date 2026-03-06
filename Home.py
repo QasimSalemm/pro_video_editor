@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import tempfile
+from random import randint
 import streamlit as st
 import utility_functions as uf
 
@@ -42,6 +43,7 @@ auto_cleanup()
 # Session State & Navigation
 # ==============================
 if "reset_key" not in st.session_state: st.session_state.reset_key = 0
+if "session_id" not in st.session_state: st.session_state.session_id = f"sess_{int(time.time())}_{randint(0, 100000)}"
 if "mt_overlays" not in st.session_state: st.session_state.mt_overlays = []
 if "mt_edit_index" not in st.session_state: st.session_state.mt_edit_index = None
 if "mt_bulk_df" not in st.session_state: st.session_state.mt_bulk_df = None

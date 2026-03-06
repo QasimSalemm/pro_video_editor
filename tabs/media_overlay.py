@@ -345,7 +345,15 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                         # 5. Display result
                         disp_w = int(video.w * (final_w_pct / 100.0))
                         disp_h = final_h_val if final_h_val > 0 else int(disp_w * (video.h / video.w))
-                        st.image(combined.resize((disp_w, disp_h)), use_container_width=True, caption=f"Preview Monitor at {clamped_t:.2f}s")
+                        
+                        # Save to a stable disk path to avoid Streamlit's "Bad filename" (MediaFileStorageError)
+                        # We use the session_id to ensure each user/session has their own preview file
+                        preview_filename = f"preview_{st.session_state.session_id}.png"
+                        preview_path = os.path.join("temp_outputs", preview_filename)
+                        
+                        combined.resize((disp_w, disp_h)).save(preview_path)
+                        
+                        st.image(preview_path, use_container_width=True, caption=f"Preview Monitor at {clamped_t:.2f}s")
                         
                         if not fonts:
                             st.warning("⚠️ No system fonts found. Using basic default font.")
