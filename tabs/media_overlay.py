@@ -16,8 +16,8 @@ from datetime import datetime
 def load_layer_to_sidebar(index, layer_data):
     st.session_state.mt_edit_index = index
     st.session_state.mt_txt_input = layer_data['text']
-    st.session_state.mt_s_t = float(layer_data['start'])
-    st.session_state.mt_e_t = float(layer_data['end'])
+    st.session_state.mt_s_t = layer_data['start']
+    st.session_state.mt_e_t = layer_data['end']
     st.session_state.mt_f_size = layer_data['font_size']
     st.session_state.mt_f_fam = layer_data.get('font_fam', 'Arial')
     st.session_state.mt_t_col = layer_data['color']
@@ -80,7 +80,7 @@ def apply_text_overlays(video_clip, overlays, font_path):
         else:
             img_clip = img_clip.set_position(ph.PRESET_POSITIONS[pos])
 
-        img_clip = img_clip.set_start(float(ov["start"])).set_duration(max(0.1, float(ov["end"]) - float(ov["start"])))
+        img_clip = img_clip.set_start(ov["start"]).set_duration(max(0.1, ov["end"] - ov["start"]))
         text_clips.append(img_clip)
     
     final = CompositeVideoClip([video_clip] + text_clips)
@@ -300,7 +300,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                         
                         # Add timeline layers that are active at this time
                         for o in st.session_state.get("mt_overlays", []):
-                            if float(o["start"]) <= clamped_t <= float(o["end"]):
+                            if o["start"] <= clamped_t <= o["end"]:
                                 to_render.append(o)
                         
                         # Add the live-edit layer on top if it has text
@@ -372,8 +372,8 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                     r_cols = st.columns([0.05, 0.2, 0.1, 0.1, 0.2, 0.15, 0.2])
                     r_cols[0].write(f"{i+1}")
                     r_cols[1].write(f"{o['text'][:30]}...")
-                    r_cols[2].write(f"{float(o['start']):.2f}")
-                    r_cols[3].write(f"{float(o['end']):.2f}")
+                    r_cols[2].write(f"{o['start']}")
+                    r_cols[3].write(f"{o['end']}")
                     r_cols[4].write(f"{o['position']}")
                     r_cols[5].caption(f"Sz: {o['font_size']} | {o['color']}")
                     
