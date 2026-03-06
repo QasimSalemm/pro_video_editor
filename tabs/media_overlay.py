@@ -16,8 +16,8 @@ from datetime import datetime
 def load_layer_to_sidebar(index, layer_data):
     st.session_state.mt_edit_index = index
     st.session_state.mt_txt_input = layer_data['text']
-    st.session_state.mt_s_t = layer_data['start']
-    st.session_state.mt_e_t = layer_data['end']
+    st.session_state.mt_s_t = float(layer_data['start'])
+    st.session_state.mt_e_t = float(layer_data['end'])
     st.session_state.mt_f_size = layer_data['font_size']
     st.session_state.mt_f_fam = layer_data.get('font_fam', 'Arial')
     st.session_state.mt_t_col = layer_data['color']
@@ -80,7 +80,7 @@ def apply_text_overlays(video_clip, overlays, font_path):
         else:
             img_clip = img_clip.set_position(ph.PRESET_POSITIONS[pos])
 
-        img_clip = img_clip.set_start(ov["start"]).set_duration(max(0.1, ov["end"] - ov["start"]))
+        img_clip = img_clip.set_start(float(ov["start"])).set_duration(max(0.1, float(ov["end"]) - float(ov["start"])))
         text_clips.append(img_clip)
     
     final = CompositeVideoClip([video_clip] + text_clips)
@@ -140,7 +140,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                     is_editing = st.session_state.mt_edit_index is not None
                     btn_label = "Update Layer" if is_editing else "Add Layer to Project"
                     
-                    if st.button(btn_label, width="stretch", type="primary"):
+                    if st.button(btn_label, use_container_width=True, type="primary"):
                         if txt.strip():
                             # Style widgets are defined below, but their keys are accessible in session state
                             fonts = ui.get_fonts()
@@ -171,7 +171,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                             st.rerun()
                     
                     if is_editing:
-                        if st.button("Cancel Edit", width="stretch"):
+                        if st.button("Cancel Edit", use_container_width=True):
                             st.session_state.mt_edit_index = None
                             st.rerun()
 
@@ -188,7 +188,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                                 st.session_state.mt_bulk_df = chunk
                                 st.session_state.last_uploaded = bulk_file.name
                             
-                            df = st.data_editor(st.session_state.mt_bulk_df, width="stretch", key="mt_bulk_editor")
+                            df = st.data_editor(st.session_state.mt_bulk_df, use_container_width=True, key="mt_bulk_editor")
                             st.session_state.mt_bulk_df = df # Keep edits in state
                             
                             required = ["text", "start", "end"]
@@ -198,9 +198,9 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                                 st.number_input("Preview Row #", 0, len(df)-1, 0, key="mt_bulk_row_num")
                                 
                                 # Actions stacked vertically
-                                st.button("👁️ Load into Monitor", width="stretch", on_click=load_bulk_row_to_preview)
+                                st.button("👁️ Load into Monitor", use_container_width=True, on_click=load_bulk_row_to_preview)
                                 
-                                if st.button("➕ Import All as Layers", width="stretch", type="primary"):
+                                if st.button("➕ Import All as Layers", use_container_width=True, type="primary"):
                                     # Get current styles
                                     cur_f_sz = st.session_state.get("mt_f_size", 20)
                                     cur_t_c = st.session_state.get("mt_t_col", "#000000")
@@ -300,7 +300,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                         
                         # Add timeline layers that are active at this time
                         for o in st.session_state.get("mt_overlays", []):
-                            if o["start"] <= clamped_t <= o["end"]:
+                            if float(o["start"]) <= clamped_t <= float(o["end"]):
                                 to_render.append(o)
                         
                         # Add the live-edit layer on top if it has text
@@ -345,7 +345,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                         # 5. Display result
                         disp_w = int(video.w * (final_w_pct / 100.0))
                         disp_h = final_h_val if final_h_val > 0 else int(disp_w * (video.h / video.w))
-                        st.image(combined.resize((disp_w, disp_h)), width="stretch", caption=f"Preview Monitor at {clamped_t:.2f}s")
+                        st.image(combined.resize((disp_w, disp_h)), use_container_width=True, caption=f"Preview Monitor at {clamped_t:.2f}s")
                         
                         if not fonts:
                             st.warning("⚠️ No system fonts found. Using basic default font.")
@@ -372,8 +372,8 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
                     r_cols = st.columns([0.05, 0.2, 0.1, 0.1, 0.2, 0.15, 0.2])
                     r_cols[0].write(f"{i+1}")
                     r_cols[1].write(f"{o['text'][:30]}...")
-                    r_cols[2].write(f"{o['start']}")
-                    r_cols[3].write(f"{o['end']}")
+                    r_cols[2].write(f"{float(o['start']):.2f}")
+                    r_cols[3].write(f"{float(o['end']):.2f}")
                     r_cols[4].write(f"{o['position']}")
                     r_cols[5].caption(f"Sz: {o['font_size']} | {o['color']}")
                     
@@ -392,7 +392,7 @@ def render_media_overlay_tab(codec, audio_codec, render_preset, render_threads):
 
         # --- Final Export ---
 
-        if st.button("Render & Export Final Video", type="primary", width="stretch"):
+        if st.button("Render & Export Final Video", type="primary", use_container_width=True):
             st.write("**Rendering your masterpiece...**")
             final_clip = video
             

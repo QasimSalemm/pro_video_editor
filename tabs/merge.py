@@ -27,7 +27,7 @@ def render_merge_tab(codec, audio_codec, render_preset, render_threads, merge_me
                 st.info(f"**Total:** `{len(clips)}` clips  \n**Final:** `{sum(c.duration for c in clips):.2f}s`  \n**Method:** `{merge_method}`")
         
         # --- Full-Width Action Row ---
-        if st.button("Merge Clips", type="primary", width="stretch"):
+        if st.button("Merge Clips", type="primary", use_container_width=True):
             if len(clips) >= 2:
                 st.write("**Merging...**")
                 final = concatenate_videoclips(clips, method=merge_method)

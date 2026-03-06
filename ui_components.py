@@ -69,8 +69,8 @@ def render_final_presentation(file_path, width_key, height_key, download_label, 
         act1, act2 = st.columns(2)
         with act1:
             with open(file_path, "rb") as f:
-                st.download_button(download_label, f, file_name=os.path.basename(file_path), width="stretch", type="primary")
+                st.download_button(download_label, f, file_name=os.path.basename(file_path), use_container_width=True, type="primary")
         with act2:
-            if st.button(reset_label, key=f"btn_reset_{width_key}", width="stretch"):
+            if st.button(reset_label, key=f"btn_reset_{width_key}", use_container_width=True):
                 reset_callback()
                 st.rerun()
