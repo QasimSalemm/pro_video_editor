@@ -3,3 +3,4 @@ libglib2.0-dev
 libsm6
 libxrender1
 libxext6
+libegl1
